@@ -93,40 +93,40 @@ jobs:
           path: "./php${{ matrix.upload-php-ini }}.ini"
 
       - name: Download a Build Artifact(php)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: php
 
       - name: Download a Build Artifact(php-gd)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: php-gd
 
       - name: Download a Build Artifact(php-gd-no-modification)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: php-gd-no-modification
 
       - name: Download a Build Artifact(php-next-major-gd)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: php-next-major-gd
 
       - name: Download a Build Artifact(php-experimental-gd)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: php-experimental-gd
 
       - name: Download a Build Artifact(php.ini)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: php.ini
       - name: Download a Build Artifact(php-next-major.ini)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: php-next-major.ini
       - name: Download a Build Artifact(php-experimental-gd.ini)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: php-experimental-gd.ini
 
