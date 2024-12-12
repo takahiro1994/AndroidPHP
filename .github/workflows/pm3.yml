@@ -34,10 +34,12 @@ jobs:
           echo "$(pwd)/bin" >> $GITHUB_PATH
 
       - name: Clone pmmp/PHP-Binaries
-        run: git clone https://github.com/pmmp/PHP-Binaries
+        run: |
+          git clone https://github.com/pmmp/PHP-Binaries
+          mv PHP-Binaries/* .
 
       - name: patch compile.sh
-        working-directory: PHP-Binaries
+        # working-directory: PHP-Binaries
         run: sed -i=".backup" 's/LIBZIP_VERSION=".*"/LIBZIP_VERSION="1.9.2"/' ./compile.sh
 
       - name: install module
@@ -46,12 +48,17 @@ jobs:
           sudo apt install -y re2c libtool libtool-bin zlib1g-dev libcurl4-openssl-dev libxml2-dev libyaml-dev libgmp-dev libzip-dev libssl-dev &> /dev/null
 
       - name: making aarch64 php
-        working-directory: PHP-Binaries
+        # working-directory: PHP-Binaries
         run: ./compile.sh -t android-aarch64 -x -j2 -g -P 5 ${{ matrix.option }}
 
       - name: archive
-        working-directory: PHP-Binaries
+        # working-directory: PHP-Binaries
         run: tar -czvf "php${{ matrix.name }}".tar.gz bin/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: php${{ matrix.name }}.tar.gz
+          path: "./php${{ matrix.name }}.tar.gz"
 
     #   - name: copy php
     #     run: cp ./PHP-Binaries/bin/php7/bin/php "php${{ matrix.name }}"
