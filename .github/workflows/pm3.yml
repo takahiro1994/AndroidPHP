@@ -13,32 +13,12 @@ jobs:
       fail-fast: true
       matrix:
           include:
-            # - option: "-P 4"
-            #   name: ""
-            #   branch: "php/8.1"
-            #   upload-php-ini: "no"
-            #   musl-cross-make-repo: "DaisukeDaisuke/musl-cross-make"
-            # - option: "-g -P 4"
-            #   name: "-gd"
-            #   branch: "php/8.1"
-            #   upload-php-ini: "no"
-            #   musl-cross-make-repo: "DaisukeDaisuke/musl-cross-make"
-            # - option: "-g -P 4"
-            #   name: "-gd-no-modification"
-            #   branch: "php/8.1"
-            #   upload-php-ini: "no"
-            #   musl-cross-make-repo: "ScerIO/musl-cross-make"
-            - option: "-g -P 5 -z 8.2"
-              name: "-next-major-gd"
-            #   branch: "php/8.1"
-              upload-php-ini: "no"
+            - option: "-z 8.2"
+              name: "-8.2"
               musl-cross-make-repo: "DaisukeDaisuke/musl-cross-make"
-            - option: "-g -P 5 -z 8.2"
-              name: "-experimental-gd"
-            #   branch: "php/8.2"
-              upload-php-ini: "no"
+            - option: "-z 8.3"
+              name: "-8.3"
               musl-cross-make-repo: "DaisukeDaisuke/musl-cross-make"
-            # Please note that if editing the matrix, the release workflow must also be edited.
     steps:
       - name: init directories
         run: mkdir -p aarch64-linux-musl
@@ -56,11 +36,6 @@ jobs:
       - name: Clone pmmp/PHP-Binaries
         run: git clone https://github.com/pmmp/PHP-Binaries
 
-    #   - name: Checkout PHP-Binaries commit
-    #     if: ${{ github.event.inputs.commithash != 'none' }}
-    #     working-directory: PHP-Binaries
-    #     run: git checkout ${{ github.event.inputs.commithash }}
-
       - name: patch compile.sh
         working-directory: PHP-Binaries
         run: sed -i=".backup" 's/LIBZIP_VERSION=".*"/LIBZIP_VERSION="1.9.2"/' ./compile.sh
@@ -72,119 +47,123 @@ jobs:
 
       - name: making aarch64 php
         working-directory: PHP-Binaries
-        run: ./compile.sh -t android-aarch64 -x -j2 ${{ matrix.option }}
+        run: ./compile.sh -t android-aarch64 -x -j2 -g -P 5 ${{ matrix.option }}
 
-      - name: copy php
-        run: cp ./PHP-Binaries/bin/php7/bin/php "php${{ matrix.name }}"
+      - name: archive
+        working-directory: PHP-Binaries
+        run: tar -czvf "php${{ matrix.name }}".tar.gz bin/
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: "php${{ matrix.name }}"
-          path: "./php${{ matrix.name }}"
+    #   - name: copy php
+    #     run: cp ./PHP-Binaries/bin/php7/bin/php "php${{ matrix.name }}"
 
-      - name: copy php.ini
-        if: ${{ matrix.upload-php-ini != 'no'}}
-        run: cp ./PHP-Binaries/bin/php7/bin/php.ini ./php${{ matrix.upload-php-ini }}.ini
+    #   - uses: actions/upload-artifact@v4
+    #     with:
+    #       name: "php${{ matrix.name }}"
+    #       path: "./php${{ matrix.name }}"
 
-      - uses: actions/upload-artifact@v4
-        if: ${{ matrix.upload-php-ini != 'no'}}
-        with:
-          name: php${{ matrix.upload-php-ini }}.ini
-          path: "./php${{ matrix.upload-php-ini }}.ini"
+    #   - name: copy php.ini
+    #     if: ${{ matrix.upload-php-ini != 'no'}}
+    #     run: cp ./PHP-Binaries/bin/php7/bin/php.ini ./php${{ matrix.upload-php-ini }}.ini
 
-      - name: Download a Build Artifact(php)
-        uses: actions/download-artifact@v3
-        with:
-          name: php
+    #   - uses: actions/upload-artifact@v4
+    #     if: ${{ matrix.upload-php-ini != 'no'}}
+    #     with:
+    #       name: php${{ matrix.upload-php-ini }}.ini
+    #       path: "./php${{ matrix.upload-php-ini }}.ini"
 
-      - name: Download a Build Artifact(php-gd)
-        uses: actions/download-artifact@v3
-        with:
-          name: php-gd
+    #   - name: Download a Build Artifact(php)
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: php
 
-      - name: Download a Build Artifact(php-gd-no-modification)
-        uses: actions/download-artifact@v3
-        with:
-          name: php-gd-no-modification
+    #   - name: Download a Build Artifact(php-gd)
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: php-gd
 
-      - name: Download a Build Artifact(php-next-major-gd)
-        uses: actions/download-artifact@v3
-        with:
-          name: php-next-major-gd
+    #   - name: Download a Build Artifact(php-gd-no-modification)
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: php-gd-no-modification
 
-      - name: Download a Build Artifact(php-experimental-gd)
-        uses: actions/download-artifact@v3
-        with:
-          name: php-experimental-gd
+    #   - name: Download a Build Artifact(php-next-major-gd)
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: php-next-major-gd
 
-      - name: Download a Build Artifact(php.ini)
-        uses: actions/download-artifact@v3
-        with:
-          name: php.ini
-      - name: Download a Build Artifact(php-next-major.ini)
-        uses: actions/download-artifact@v3
-        with:
-          name: php-next-major.ini
-      - name: Download a Build Artifact(php-experimental-gd.ini)
-        uses: actions/download-artifact@v3
-        with:
-          name: php-experimental-gd.ini
+    #   - name: Download a Build Artifact(php-experimental-gd)
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: php-experimental-gd
+
+    #   - name: Download a Build Artifact(php.ini)
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: php.ini
+    #   - name: Download a Build Artifact(php-next-major.ini)
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: php-next-major.ini
+    #   - name: Download a Build Artifact(php-experimental-gd.ini)
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: php-experimental-gd.ini
 
 
-      - name: file compressions
-        run: |
-          zip -9 zip-php php
-          zip -9 zip-php-gd php-gd
-          zip -9 zip-php-gd-no-modification php-gd-no-modification
-          zip -9 zip-php-next-major-gd php-next-major-gd
-          zip -9 zip-php-experimental-gd php-experimental-gd
+#       - name: file compressions
+#         run: |
+#           zip -9 zip-php php
+#           zip -9 zip-php-gd php-gd
+#           zip -9 zip-php-gd-no-modification php-gd-no-modification
+#           zip -9 zip-php-next-major-gd php-next-major-gd
+#           zip -9 zip-php-experimental-gd php-experimental-gd
 
-      - name: create checksums.sha256
-        run: |
-          sha256sum "php" "php-gd" "php-gd-no-modification" "php-next-major-gd" "php-experimental-gd" "zip-php.zip" "zip-php-gd.zip" "zip-php-gd-no-modification.zip" "zip-php-next-major-gd.zip" "zip-php-experimental-gd.zip" "php.ini" "php-next-major.ini" "php-experimental-gd.ini" > checksums.sha256
-          cat checksums.sha256
+#       - name: create checksums.sha256
+#         run: |
+#           sha256sum "php" "php-gd" "php-gd-no-modification" "php-next-major-gd" "php-experimental-gd" "zip-php.zip" "zip-php-gd.zip" "zip-php-gd-no-modification.zip" "zip-php-next-major-gd.zip" "zip-php-experimental-gd.zip" "php.ini" "php-next-major.ini" "php-experimental-gd.ini" > checksums.sha256
+#           cat checksums.sha256
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: "checksums.sha256"
-          path: "./checksums.sha256"
+#       - uses: actions/upload-artifact@v4
+#         with:
+#           name: "checksums.sha256"
+#           path: "./checksums.sha256"
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.event.inputs.tagname }}
-          name: Release ${{ github.event.inputs.tagname }}
-          files: |
-            php
-            php-gd
-            php-gd-no-modification
-            php-next-major-gd
-            php-experimental-gd
-            zip-php.zip
-            zip-php-gd.zip
-            zip-php-gd-no-modification.zip
-            zip-php-next-major-gd.zip
-            zip-php-experimental-gd.zip
-            php.ini
-            php-next-major.ini
-            php-experimental-gd.ini
-            checksums.sha256
-          body: "The php version for this release is ${{ github.event.inputs.tagname }}.
+#       - name: Create Release
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           tag_name: ${{ github.event.inputs.tagname }}
+#           name: Release ${{ github.event.inputs.tagname }}
+#           files: |
+#             php
+#             php-gd
+#             php-gd-no-modification
+#             php-next-major-gd
+#             php-experimental-gd
+#             zip-php.zip
+#             zip-php-gd.zip
+#             zip-php-gd-no-modification.zip
+#             zip-php-next-major-gd.zip
+#             zip-php-experimental-gd.zip
+#             php.ini
+#             php-next-major.ini
+#             php-experimental-gd.ini
+#             checksums.sha256
+#           body: "The php version for this release is ${{ github.event.inputs.tagname }}.
 
-The download is available from the Assets dropdown.
+# The download is available from the Assets dropdown.
 
-#### Notes
+# #### Notes
 
-This binary does not support jit.
+# This binary does not support jit.
 
-This binary is for ARMv8 (aarch64, 64bit).
+# This binary is for ARMv8 (aarch64, 64bit).
 
-It does not work on arm (32bit).
+# It does not work on arm (32bit).
 
-All binaries are not compatible with pmmp3 and are for pmmp4.
+# All binaries are not compatible with pmmp3 and are for pmmp4.
 
-the php or php-gd binaries are recommended.
+# the php or php-gd binaries are recommended.
 
-The php version of php-next-major-gd is 8.1..
-The php version of php-experimental-gd is 8.2..
-"
+# The php version of php-next-major-gd is 8.1..
+# The php version of php-experimental-gd is 8.2..
+# "
