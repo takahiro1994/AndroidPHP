@@ -1,18 +1,6 @@
 on:
-  workflow_dispatch:
-    inputs:
-      tagname:
-        description: "tagname"
-        required: true
-        default: "8.0.20"
-      commithash:
-        description: "commit hash"
-        required: true
-        default: "none"
-      createRelease:
-        description: "If 'yes', create the release."
-        required: true
-        default: "yes"
+  push:
+    branches: "*"
 
 name: Release Binaries pmmp 3
 
