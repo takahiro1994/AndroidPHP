@@ -54,7 +54,7 @@ jobs:
           echo "$(pwd)/bin" >> $GITHUB_PATH
 
       - name: Clone pmmp/PHP-Binaries
-        run: git clone pmmp/PHP-Binaries
+        run: git clone https://github.com/pmmp/PHP-Binaries
 
     #   - name: Checkout PHP-Binaries commit
     #     if: ${{ github.event.inputs.commithash != 'none' }}
