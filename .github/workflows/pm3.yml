@@ -91,12 +91,7 @@ jobs:
         with:
           name: php${{ matrix.upload-php-ini }}.ini
           path: "./php${{ matrix.upload-php-ini }}.ini"
-  commit-php:
-    name: release
-    needs: build-php
-    runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.createRelease == 'yes'}}
-    steps:
+
       - name: Download a Build Artifact(php)
         uses: actions/download-artifact@v2
         with:
