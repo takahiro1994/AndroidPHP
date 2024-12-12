@@ -62,7 +62,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: install.log
+          name: ${{ matrix.name }}-install.log
           path: "./install.log"
 
     #   - name: copy php
