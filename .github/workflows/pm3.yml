@@ -188,4 +188,4 @@ jobs:
             php-next-major.ini
             php-experimental-gd.ini
             checksums.sha256
-          body: "The php version for this release is ${{ github.event.inputs.tagname }}.
+          body: "The php version for this release is ${{ github.event.inputs.tagname }}."
