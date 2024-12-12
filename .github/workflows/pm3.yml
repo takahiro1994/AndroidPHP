@@ -1,5 +1,5 @@
 on:
-  oush:
+  push:
     branches: "*"
 
 name: Release Binaries pmmp 3
