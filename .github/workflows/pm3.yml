@@ -80,7 +80,7 @@ jobs:
       - name: copy php
         run: cp ./php-build-scripts/bin/php7/bin/php "php${{ matrix.name }}"
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: "php${{ matrix.name }}"
           path: "./php${{ matrix.name }}"
@@ -89,7 +89,7 @@ jobs:
         if: ${{ matrix.upload-php-ini != 'no'}}
         run: cp ./php-build-scripts/bin/php7/bin/php.ini ./php${{ matrix.upload-php-ini }}.ini
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.upload-php-ini != 'no'}}
         with:
           name: php${{ matrix.upload-php-ini }}.ini
@@ -152,7 +152,7 @@ jobs:
           sha256sum "php" "php-gd" "php-gd-no-modification" "php-next-major-gd" "php-experimental-gd" "zip-php.zip" "zip-php-gd.zip" "zip-php-gd-no-modification.zip" "zip-php-next-major-gd.zip" "zip-php-experimental-gd.zip" "php.ini" "php-next-major.ini" "php-experimental-gd.ini" > checksums.sha256
           cat checksums.sha256
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: "checksums.sha256"
           path: "./checksums.sha256"
