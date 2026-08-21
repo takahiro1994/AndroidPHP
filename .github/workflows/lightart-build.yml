@@ -1,0 +1,65 @@
+name: LightArt APK Build
+
+on:
+  push:
+    branches:
+      - lightart-build-20260822
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct LightArt source
+        shell: bash
+        run: |
+          cat lightart_payload/part-* > lightart-project.zip.b64
+          base64 -d lightart-project.zip.b64 > lightart-project.zip
+          mkdir -p lightart-ci
+          unzip -q lightart-project.zip -d lightart-ci
+          test -f lightart-ci/app/src/main/cpp/native_art.c
+          test -f lightart-ci/app/src/main/res/drawable/ic_launcher.xml
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-28" "build-tools;35.0.0" "cmake;3.22.1" "ndk;27.0.12077973"
+
+      - name: Build APK
+        working-directory: lightart-ci
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Verify APK contents
+        shell: bash
+        run: |
+          APK=lightart-ci/app/build/outputs/apk/debug/app-debug.apk
+          test -f "$APK"
+          unzip -l "$APK" | grep classes.dex
+          unzip -l "$APK" | grep 'lib/arm64-v8a/liblightart.so'
+          cp "$APK" LightArtStudio-v1.1-debug.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LightArtStudio-v1.1-debug
+          path: LightArtStudio-v1.1-debug.apk
+          if-no-files-found: error
